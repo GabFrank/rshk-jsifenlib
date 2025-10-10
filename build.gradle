@@ -4,7 +4,7 @@ plugins {
     id "signing"
 }
 
-group "com.frc.sifen"
+group "io.github.gabfrank"
 version "0.2.4-frc.1"
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
@@ -37,7 +37,7 @@ javadoc {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "frc-jsifenlib"
+            artifactId = "jsifenlib"
             from components.java
 
             pom {
@@ -83,19 +83,22 @@ publishing {
 
     repositories {
         maven {
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            name = "OSSRH"
             def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
+                username = System.getenv("CENTRAL_USERNAME")
+                password = System.getenv("CENTRAL_PASSWORD")
             }
         }
     }
 }
 
 signing {
-    required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
-    useInMemoryPgpKeys(System.getenv("GPG_KEY"), System.getenv("GPG_PASSWORD"))
-    sign publishing.publications.mavenJava
+    required { isReleaseVersion && gradle.taskGraph.hasTask("publish") && System.getenv("GPG_KEY") != null }
+    if (System.getenv("GPG_KEY") != null) {
+        useInMemoryPgpKeys(System.getenv("GPG_KEY"), System.getenv("GPG_PASSWORD"))
+        sign publishing.publications.mavenJava
+    }
 }

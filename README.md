@@ -13,8 +13,8 @@ La versión 0.2.4 publicada en Maven Central tiene un problema donde `Sifen.rece
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.frc.sifen</groupId>
-        <artifactId>frc-jsifenlib</artifactId>
+        <groupId>io.github.gabfrank</groupId>
+        <artifactId>jsifenlib</artifactId>
         <version>0.2.4-frc.1</version>
     </dependency>
 </dependencies>
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.frc.sifen:frc-jsifenlib:0.2.4-frc.1'
+    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.1'
 }
 ```
 
@@ -230,8 +230,8 @@ Si estás usando la versión original y tienes problemas con XML mal formado en 
 
 <!-- Por esto -->
 <dependency>
-    <groupId>com.frc.sifen</groupId>
-    <artifactId>frc-jsifenlib</artifactId>
+    <groupId>io.github.gabfrank</groupId>
+    <artifactId>jsifenlib</artifactId>
     <version>0.2.4-frc.1</version>
 </dependency>
 ```
