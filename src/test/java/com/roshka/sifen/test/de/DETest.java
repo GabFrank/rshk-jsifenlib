@@ -8,6 +8,7 @@ import com.roshka.sifen.core.beans.response.*;
 import com.roshka.sifen.core.exceptions.SifenException;
 import com.roshka.sifen.core.fields.request.de.*;
 import com.roshka.sifen.core.fields.request.event.TgGroupTiEvt;
+import com.roshka.sifen.core.fields.request.event.TrGeVeCan;
 import com.roshka.sifen.core.fields.request.event.TrGeVeDisconf;
 import com.roshka.sifen.core.fields.request.event.TrGesEve;
 import com.roshka.sifen.core.types.*;
@@ -25,8 +26,21 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class DETest extends DETestBase {
+    
+    private static final Random random = new Random();
+    
+    /**
+     * Genera un ID único para eventos según el tipo tdIdEve del XSD
+     * Rango: 1 a 9999999999
+     */
+    private static String generateEventId() {
+        // Generar número entre 1 y 9999999999
+        long randomId = 1 + (long) (random.nextDouble() * 9999999998L);
+        return String.valueOf(randomId);
+    }
     @Test
     @Ignore
     public void testRecepcionDE() throws SifenException {
@@ -386,6 +400,96 @@ public class DETest extends DETestBase {
     public void testValidacionDE() {
         ValidezFirmaDigital validity = Sifen.validarFirmaDE("D:\\de.xml");
         logger.info(validity.isValido() ? "Firma digital válida" : "Firma digital inválida");
+    }
+
+    @Test
+    @Ignore
+    public void cancelarDE() throws SifenException {
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        // Evento de Cancelación - Campos obligatorios según documentación técnica
+        TrGeVeCan trGeVeCan = new TrGeVeCan();
+        
+        // GEC002 - Id: Identificador del DTE (obligatorio, 1-1)
+        // IMPORTANTE: Usar un CDC de un DE que realmente existe y está aprobado
+        trGeVeCan.setId("01800994825001001000005222025100617372448752");
+        
+        // GEC003 - mOtEve: Motivo del Evento (obligatorio, 1-1, 5-500 caracteres)
+        trGeVeCan.setmOtEve("Cancelación solicitada por error en los datos del documento electrónico");
+
+        // GEC001 - rGeVeCan: Raíz Gestión de Eventos Cancelación (obligatorio según TGDE-3)
+        TgGroupTiEvt tgGroupTiEvt = new TgGroupTiEvt();
+        tgGroupTiEvt.setrGeVeCan(trGeVeCan);
+
+        // Configuración del evento - IMPORTANTE: El ID debe ser un número entero según XSD
+        TrGesEve rGesEve = new TrGesEve();
+        
+        // Generar ID aleatorio único para el evento (1-9999999999) según tdIdEve
+        String eventId = generateEventId();
+        rGesEve.setId(eventId);
+        rGesEve.setdFecFirma(currentDate);
+        rGesEve.setgGroupTiEvt(tgGroupTiEvt);
+
+        // Crear el objeto EventosDE
+        EventosDE eventosDE = new EventosDE();
+        eventosDE.setrGesEveList(Collections.singletonList(rGesEve));
+
+        // Validaciones antes del envío
+        logger.info("=== VALIDACIONES ANTES DEL ENVÍO ===");
+        logger.info("ID del Evento (generado): " + eventId);
+        logger.info("ID del DTE a cancelar: " + trGeVeCan.getId());
+        logger.info("Longitud del CDC: " + (trGeVeCan.getId() != null ? trGeVeCan.getId().length() : "null"));
+        logger.info("Motivo del evento: " + trGeVeCan.getmOtEve());
+        logger.info("Longitud del motivo: " + (trGeVeCan.getmOtEve() != null ? trGeVeCan.getmOtEve().length() : "null"));
+        logger.info("Fecha de firma: " + rGesEve.getdFecFirma());
+        logger.info("Tipo de evento: CANCELACIÓN");
+        logger.info("=====================================");
+
+        try {
+            // Enviar el evento de cancelación
+            RespuestaRecepcionEvento ret = Sifen.recepcionEvento(eventosDE);
+            logger.info("RESPUESTA EXITOSA:");
+            logger.info(ret.toString());
+        } catch (SifenException e) {
+            logger.severe("ERROR EN CANCELACIÓN:");
+            logger.severe("Mensaje: " + e.getMessage());
+            logger.severe("Causa: " + (e.getCause() != null ? e.getCause().getMessage() : "No especificada"));
+            
+            // Re-lanzar para que el test falle y podamos ver el error completo
+            throw e;
+        }
+    }
+
+    @Test
+    @Ignore
+    public void verificarDocumentoAntesDeCancelar() throws SifenException {
+        // Primero verificar que el documento existe y está en estado correcto
+        String cdc = "01800994825001001000005222025100617372448752";
+        
+        logger.info("=== VERIFICANDO DOCUMENTO ANTES DE CANCELAR ===");
+        logger.info("CDC a verificar: " + cdc);
+        
+        try {
+            RespuestaConsultaDE consulta = Sifen.consultaDE(cdc);
+            logger.info("Estado de la consulta: " + consulta.getCodigoEstado());
+            logger.info("Código de respuesta: " + consulta.getdCodRes());
+            logger.info("Mensaje de respuesta: " + consulta.getdMsgRes());
+            logger.info("Respuesta completa: " + consulta.toString());
+            
+            // Si el documento existe y está aprobado, proceder con la cancelación
+            if (consulta.getCodigoEstado() == 200 && "0422".equals(consulta.getdCodRes())) {
+                logger.info("✅ Documento encontrado y aprobado. Procediendo con cancelación...");
+                // Aquí llamarías al método de cancelación
+            } else {
+                logger.warning("⚠️ El documento no está en estado correcto para cancelación");
+                logger.warning("Estado: " + consulta.getCodigoEstado() + " - Código: " + consulta.getdCodRes());
+            }
+            
+        } catch (SifenException e) {
+            logger.severe("❌ Error al consultar el documento:");
+            logger.severe("Mensaje: " + e.getMessage());
+            throw e;
+        }
     }
 
 }

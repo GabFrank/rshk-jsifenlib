@@ -4,3 +4,4 @@ gradle/
 .idea/
 tmp/
 src/test/resources/test.properties
+bin/

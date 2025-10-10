@@ -1,7 +1,10 @@
-# RSHK jsifenlib
+# FRC jsifenlib (Fork de RSHK jsifenlib)
 
-`rshk-jsifenlib` es una librería de código abierto, sin dependencias externas, para interactuar con SIFEN (Sistema
-Integrado de Factura Electrónica Nacional) a través de un SDK para el lenguaje Java versión 8.
+Este es un fork de `rshk-jsifenlib` con correcciones importantes para problemas de XML mal formado en eventos de cancelación.
+
+## ¿Por qué este fork?
+
+La versión 0.2.4 publicada en Maven Central tiene un problema donde `Sifen.recepcionEvento(eventosDE)` genera XML mal formado para operaciones de cancelación. Este fork incluye las correcciones más recientes del repositorio upstream que solucionan este problema.
 
 ## Instalación
 
@@ -10,9 +13,9 @@ Integrado de Factura Electrónica Nacional) a través de un SDK para el lenguaje
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.roshka.sifen</groupId>
-        <artifactId>rshk-jsifenlib</artifactId>
-        <version>0.2.4</version>
+        <groupId>com.frc.sifen</groupId>
+        <artifactId>frc-jsifenlib</artifactId>
+        <version>0.2.4-frc.1</version>
     </dependency>
 </dependencies>
 ```
@@ -25,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.roshka.sifen:rshk-jsifenlib:0.2.4'
+    implementation 'com.frc.sifen:frc-jsifenlib:0.2.4-frc.1'
 }
 ```
 
@@ -206,3 +209,35 @@ Algunas empresas que utilizan esta librería en producción para sus implementac
 - Pablo Santa Cruz ([github/pablo](https://github.com/pablo))
 - Martin Zarza ([github/martinzarza](https://github.com/martinzarza))
 - David Ayala ([github/david-ayala](https://github.com/david-ayala))
+
+## Diferencias con el proyecto original
+
+- ✅ **Dependencias SOAP incluidas**: `saaj-impl:1.5.3` y `javax.xml.soap-api:1.4.0`
+- ✅ **XML bien formado**: Corrige el problema de XML mal formado en `recepcionEvento()`
+- ✅ **Sincronización regular**: Este fork se mantiene actualizado con el proyecto upstream
+
+## Migración desde la versión original
+
+Si estás usando la versión original y tienes problemas con XML mal formado en eventos de cancelación:
+
+```xml
+<!-- Reemplazar esto -->
+<dependency>
+    <groupId>com.roshka.sifen</groupId>
+    <artifactId>rshk-jsifenlib</artifactId>
+    <version>0.2.4</version>
+</dependency>
+
+<!-- Por esto -->
+<dependency>
+    <groupId>com.frc.sifen</groupId>
+    <artifactId>frc-jsifenlib</artifactId>
+    <version>0.2.4-frc.1</version>
+</dependency>
+```
+
+No se requieren cambios en el código, solo actualizar la dependencia.
+
+## Sincronización con upstream
+
+Este fork se mantiene sincronizado con el [proyecto original](https://github.com/roshkadev/rshk-jsifenlib). Cuando el proyecto original publique una nueva versión con estos fixes, se evaluará la migración de vuelta al proyecto principal.

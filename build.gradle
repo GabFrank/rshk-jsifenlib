@@ -4,14 +4,14 @@ plugins {
     id "signing"
 }
 
-group "com.roshka.sifen"
-version "0.2.4"
+group "com.frc.sifen"
+version "0.2.4-frc.1"
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
-sourceCompatibility = 1.8
 java {
-    withJavadocJar()
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
 }
 
@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+    implementation "com.sun.xml.messaging.saaj:saaj-impl:1.5.3"
+    implementation "javax.xml.soap:javax.xml.soap-api:1.4.0"
     testImplementation group: "junit", name: "junit", version: "4.13.1"
     testImplementation "org.hamcrest:hamcrest:2.2"
 }
@@ -35,13 +37,13 @@ javadoc {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "rshk-jsifenlib"
+            artifactId = "frc-jsifenlib"
             from components.java
 
             pom {
-                name = "RSHK jsifenlib"
-                description = "Librería de código abierto, sin dependencias externas, para interactuar con SIFEN (Sistema Integrado de Facturación Electrónica Nacional)."
-                url = "https://github.com/roshkadev/rshk-jsifenlib/"
+                name = "FRC jsifenlib"
+                description = "Fork de RSHK jsifenlib con correcciones para XML mal formado en eventos de cancelación."
+                url = "https://github.com/GabFrank/rshk-jsifenlib/"
                 licenses {
                     license {
                         name = "MIT License"
@@ -64,11 +66,16 @@ publishing {
                         name = "Martin Zarza"
                         email = "mzarza99@gmail.com"
                     }
+                    developer {
+                        id = "gabfrank"
+                        name = "Gabriel Frank"
+                        email = "gabfrank@gmail.com"
+                    }
                 }
                 scm {
-                    connection = "scm:git:git://github.com/roshkadev/rshk-jsifenlib.git/"
-                    developerConnection = "scm:git:ssh://github.com/roshkadev/rshk-jsifenlib.git/"
-                    url = "https://github.com/roshkadev/rshk-jsifenlib/"
+                    connection = "scm:git:git://github.com/GabFrank/rshk-jsifenlib.git/"
+                    developerConnection = "scm:git:ssh://github.com/GabFrank/rshk-jsifenlib.git/"
+                    url = "https://github.com/GabFrank/rshk-jsifenlib/"
                 }
             }
         }
