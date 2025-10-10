@@ -5,7 +5,7 @@ plugins {
 }
 
 group "io.github.gabfrank"
-version "0.2.4-frc.1"
+version "0.2.4-frc.2"
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 

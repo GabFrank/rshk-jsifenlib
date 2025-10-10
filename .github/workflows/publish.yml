@@ -36,4 +36,14 @@ jobs:
         CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
         CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
         GPG_KEY: ${{ secrets.GPG_KEY }}
-        GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+        GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}   
+ - name: Build JARs for GitHub Release
+      run: ./gradlew build
+      
+    - name: Upload JARs to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          build/libs/*.jar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
