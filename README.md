@@ -15,7 +15,7 @@ La versión 0.2.4 publicada en Maven Central tiene un problema donde `Sifen.rece
     <dependency>
         <groupId>io.github.gabfrank</groupId>
         <artifactId>jsifenlib</artifactId>
-        <version>0.2.4-frc.2</version>
+        <version>0.2.4-frc.3</version>
     </dependency>
 </dependencies>
 ```
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.2'
+    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.3'
 }
 ```
 
@@ -232,7 +232,7 @@ Si estás usando la versión original y tienes problemas con XML mal formado en 
 <dependency>
     <groupId>io.github.gabfrank</groupId>
     <artifactId>jsifenlib</artifactId>
-    <version>0.2.4-frc.2</version>
+    <version>0.2.4-frc.3</version>
 </dependency>
 ```
 
