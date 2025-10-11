@@ -24,7 +24,7 @@ Primero, agrega el repositorio de GitHub Packages en tu `pom.xml`:
     <dependency>
         <groupId>io.github.gabfrank</groupId>
         <artifactId>jsifenlib</artifactId>
-        <version>0.2.4-frc.12</version>
+        <version>0.2.4-frc.13</version>
     </dependency>
 </dependencies>
 ```
@@ -59,7 +59,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.12'
+    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.13'
 }
 ```
 
