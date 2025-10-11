@@ -5,7 +5,7 @@ plugins {
 }
 
 group "io.github.gabfrank"
-version "0.2.4-frc.8"
+version "0.2.4-frc.9"
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -83,10 +83,8 @@ publishing {
 
     repositories {
         maven {
-            name = "OSSRH"
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            name = "CentralPortal"
+            url = "https://central.sonatype.com/api/v1/publisher/upload"
             credentials {
                 username = System.getenv("CENTRAL_USERNAME")
                 password = System.getenv("CENTRAL_PASSWORD")
