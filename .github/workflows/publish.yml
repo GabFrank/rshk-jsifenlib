@@ -1,4 +1,4 @@
-name: Publish to Maven Central
+name: Publish to GitHub Packages
 
 on:
   release:
@@ -29,13 +29,11 @@ jobs:
     - name: Build project
       run: ./gradlew clean build
       
-    - name: Publish to Maven Central
+    - name: Publish to GitHub Packages
       run: ./gradlew publish
       env:
-        CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
-        CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
-        GPG_KEY: ${{ secrets.GPG_KEY }}
-        GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Upload JARs to GitHub Release
       uses: softprops/action-gh-release@v1

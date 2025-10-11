@@ -10,26 +10,64 @@ La versión 0.2.4 publicada en Maven Central tiene un problema donde `Sifen.rece
 
 ### Maven
 
+Primero, agrega el repositorio de GitHub Packages en tu `pom.xml`:
+
 ```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <url>https://maven.pkg.github.com/GabFrank/rshk-jsifenlib</url>
+    </repository>
+</repositories>
+
 <dependencies>
     <dependency>
         <groupId>io.github.gabfrank</groupId>
         <artifactId>jsifenlib</artifactId>
-        <version>0.2.4-frc.3</version>
+        <version>0.2.4-frc.12</version>
     </dependency>
 </dependencies>
 ```
+
+Luego, configura la autenticación en tu `~/.m2/settings.xml`:
+
+```xml
+<settings>
+    <servers>
+        <server>
+            <id>github</id>
+            <username>TU_USUARIO_GITHUB</username>
+            <password>TU_PERSONAL_ACCESS_TOKEN</password>
+        </server>
+    </servers>
+</settings>
+```
+
+**Nota**: Necesitas un [Personal Access Token de GitHub](https://github.com/settings/tokens) con el scope `read:packages`.
 
 ### Gradle
 
 ```groovy
 repositories {
-    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/GabFrank/rshk-jsifenlib")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
-    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.3'
+    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.12'
 }
+```
+
+Agrega en tu `~/.gradle/gradle.properties`:
+
+```properties
+gpr.user=TU_USUARIO_GITHUB
+gpr.token=TU_PERSONAL_ACCESS_TOKEN
 ```
 
 ## Servicios Web de SIFEN
