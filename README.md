@@ -1,22 +1,60 @@
 # FRC jsifenlib (Fork de RSHK jsifenlib)
 
-Este es un fork de `rshk-jsifenlib` con correcciones importantes para problemas de XML mal formado en eventos de cancelación.
+Fork de `rshk-jsifenlib` con correcciones para problemas de XML mal formado en eventos de cancelación.
 
-## ¿Por qué este fork?
+[![GitHub Release](https://img.shields.io/github/v/release/GabFrank/rshk-jsifenlib)](https://github.com/GabFrank/rshk-jsifenlib/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-La versión 0.2.4 publicada en Maven Central tiene un problema donde `Sifen.recepcionEvento(eventosDE)` genera XML mal formado para operaciones de cancelación. Este fork incluye las correcciones más recientes del repositorio upstream que solucionan este problema.
+## 🚀 ¿Por qué este fork?
 
-## Instalación
+La versión 0.2.4 publicada en Maven Central del proyecto original tiene un problema donde `Sifen.recepcionEvento(eventosDE)` genera XML mal formado para operaciones de cancelación. Este fork incluye:
 
-### Maven
+- ✅ **Fix del XML mal formado** en eventos de cancelación
+- ✅ **Dependencias SOAP incluidas** (saaj-impl:1.5.3, javax.xml.soap-api:1.4.0)
+- ✅ **Sincronización con upstream** - Se mantiene actualizado con el proyecto original
+- ✅ **Publicado en GitHub Packages** - Fácil acceso y distribución
 
-Primero, agrega el repositorio de GitHub Packages en tu `pom.xml`:
+## 📦 Instalación
+
+### Requisitos previos
+
+1. **Crear un Personal Access Token de GitHub**:
+   - Ve a https://github.com/settings/tokens
+   - Click en **"Generate new token (classic)"**
+   - Selecciona el scope **`read:packages`**
+   - Copia el token generado
+
+### Maven (Spring Boot / Java)
+
+**1. Configurar autenticación**
+
+Edita o crea `~/.m2/settings.xml`:
+
+```xml
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <server>
+            <id>github</id>
+            <username>TU_USUARIO_GITHUB</username>
+            <password>TU_PERSONAL_ACCESS_TOKEN</password>
+        </server>
+    </servers>
+</settings>
+```
+
+**2. Agregar en tu `pom.xml`**:
 
 ```xml
 <repositories>
     <repository>
         <id>github</id>
         <url>https://maven.pkg.github.com/GabFrank/rshk-jsifenlib</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
     </repository>
 </repositories>
 
@@ -29,23 +67,24 @@ Primero, agrega el repositorio de GitHub Packages en tu `pom.xml`:
 </dependencies>
 ```
 
-Luego, configura la autenticación en tu `~/.m2/settings.xml`:
+**3. Instalar**:
 
-```xml
-<settings>
-    <servers>
-        <server>
-            <id>github</id>
-            <username>TU_USUARIO_GITHUB</username>
-            <password>TU_PERSONAL_ACCESS_TOKEN</password>
-        </server>
-    </servers>
-</settings>
+```bash
+mvn clean install
 ```
 
-**Nota**: Necesitas un [Personal Access Token de GitHub](https://github.com/settings/tokens) con el scope `read:packages`.
-
 ### Gradle
+
+**1. Configurar autenticación**
+
+Agrega en `~/.gradle/gradle.properties`:
+
+```properties
+gpr.user=TU_USUARIO_GITHUB
+gpr.token=TU_PERSONAL_ACCESS_TOKEN
+```
+
+**2. Agregar en tu `build.gradle`**:
 
 ```groovy
 repositories {
@@ -63,219 +102,274 @@ dependencies {
 }
 ```
 
-Agrega en tu `~/.gradle/gradle.properties`:
+## 🔄 Actualización de versiones
 
-```properties
-gpr.user=TU_USUARIO_GITHUB
-gpr.token=TU_PERSONAL_ACCESS_TOKEN
-```
+Para actualizar a una nueva versión:
 
-## Servicios Web de SIFEN
+1. **Verificar la última versión** en [Releases](https://github.com/GabFrank/rshk-jsifenlib/releases)
+2. **Actualizar la versión** en tu `pom.xml` o `build.gradle`
+3. **Ejecutar**:
+   ```bash
+   # Maven
+   mvn clean install
+   
+   # Gradle
+   ./gradlew build --refresh-dependencies
+   ```
 
-- Consulta de RUC
-- Recepción de Documento Electrónico - Síncrono
-- Consulta de Documentos Electrónicos
-- Recepción de Lote de Documentos Electrónicos - Asíncrono
-- Consulta de Estado de Documentos Electrónicos (Lote)
-- Recepción de Eventos
+## 📖 Uso
 
-## Uso
+***Importante: Leer el [Manual Técnico de Sifen](https://www.dnit.gov.py/documents/20123/420592/Manual+T%C3%A9cnico+Versi%C3%B3n+150.pdf) antes de continuar.***
 
-***Importante: Leer
-el [Manual Técnico de Sifen](https://www.dnit.gov.py/documents/20123/420592/Manual+T%C3%A9cnico+Versi%C3%B3n+150.pdf/e706f7c7-6d93-21d4-b45b-5d22d07b2d22?t=1687351495907)
-y entender el funcionamiento básico antes de continuar con la guía de uso de esta librería.***
-
-### Configuración
-
-Para utilizar las funciones ofrecidas por `RSHK jsifenlib` es necesario configurar los siguientes ítems:
-
-- Tipo de Ambiente (Desarrollo o Producción)
-- Certificado y Tipo de Certificado (Solo PFX está soportado actualmente)
-- Código de Seguridad (CSC)
-
-Para esto, crear una nueva instancia de la clase `SifenConfig` utilizando alguno de los constructores:
+### Configuración inicial
 
 ```java
+import com.roshka.sifen.Sifen;
+import com.roshka.sifen.core.SifenConfig;
 
-public class MiClase {
-
-    public static void main(String[] args) {
-        // Constructor vacío. Los valores se deben agregar por medio de los *setters* de la clase.
-        SifenConfig config = new SifenConfig();
-
-        // Constructor con el tipo de ambiente, tipo de certificado, la ruta del certificado y la contraseña.
-        SifenConfig config = new SifenConfig(
-                SifenConfig.TipoAmbiente.PROD,
-                SifenConfig.TipoCertificadoCliente.PFX,
-                "C:\\Users\\Roshka\\Documents\\certificado.pfx",
-                "password"
-        );
-
-    }
-
-}
-
-public class MiClase {
+public class SifenSetup {
     
-    public static void main(String[] args) {
-        // Constructor vacío. Los valores se deben agregar por medio de los *setters* de la clase.
-        SifenConfig config = new SifenConfig();
-        
-        // Constructor igual al anterior, con el CSC y su ID.
+    public static void configurar() {
         SifenConfig config = new SifenConfig(
-                SifenConfig.TipoAmbiente.PROD,
-                "0002", // ID CSC
-                "EFGH0000000000000000000000000000", // CSC
-                SifenConfig.TipoCertificadoCliente.PFX,
-                "C:\\Users\\Roshka\\Documents\\certificado.pfx",
-                "password"
+            SifenConfig.TipoAmbiente.PROD,  // o DEV para testing
+            SifenConfig.TipoCertificadoCliente.PFX,
+            "/ruta/al/certificado.pfx",
+            "password_del_certificado"
         );
         
-    }
+        // Con CSC (Código de Seguridad del Contribuyente)
+        config.setCsc("ABCD0000000000000000000000000000");
+        config.setCscId("0001");
         
+        Sifen.setSifenConfig(config);
+    }
 }
 ```
 
-La clase `SifenConfig` también se puede crear a partir de un método de construcción que toma los datos de un
-archivo de propiedades de la siguiente manera:
+### Configuración desde archivo properties
 
-```java
-SifenConfig sifenConfig = SifenConfig.loadFromFileName("conf/sifen.properties");
-```
-
-Este archivo debe tener el siguiente formato, dependiendo de las necesidades:
+Crear `sifen.properties`:
 
 ```properties
-# Esto puede ser:
-# DEV (apunta al ambiente de desarrollo/test de SIFEN)
-# PROD (apunta al ambiente de producción de SIFEN)
-sifen.ambiente=DEV
-
-# NO modificar a menos que uno sepa bien lo que está haciendo
-# sifen.url_base=
-
-# Si se va a usar el certificado cliente.
-# Este valor en el 99.99% de las veces va a ser true
-# a menos que uno sepa bien lo que está haciendo
+sifen.ambiente=PROD
 sifen.certificado_cliente.usar=true
-# Por ahora, el único valor aceptado es PFX
 sifen.certificado_cliente.tipo=PFX
-
-## RUTA APUNTANDO AL ARCHIVO PFX
-sifen.certificado_cliente.archivo=/home/charly/garcia.pfx
-
-## PASSWORD del ARCHIVO PFX
-sifen.certificado_cliente.contrasena=my_password
-
-## Nota técnica 13 (23/04/2023)
-## Para habilitar los campos nuevos de esta nota técnica, cambiar a true
-sifen.habilitar_nota_tecnica_13=false
-
-## CSC
+sifen.certificado_cliente.archivo=/ruta/al/certificado.pfx
+sifen.certificado_cliente.contrasena=password
 sifen.csc=ABCD0000000000000000000000000000
 sifen.csc.id=0001
+sifen.habilitar_nota_tecnica_13=true
 ```
-Luego de preparar la configuración, establecer la misma para usarla con las diferentes consultas.
+
+Cargar configuración:
 
 ```java
+SifenConfig config = SifenConfig.loadFromFileName("sifen.properties");
 Sifen.setSifenConfig(config);
 ```
 
-Esto solo debe realizarse una vez al principio, antes de ejecutar alguna acción. Si la configuración necesita ser
-actualizada, simplemente invocar de vuelta.
-
-### Consulta de RUC
-
-El uso del servicio web de Consulta de RUC se puede realizar de la siguiente forma:
+### Ejemplo: Consulta de RUC
 
 ```java
-RespuestaConsultaRUC respuesta = Sifen.consultaRUC("80089752");
+import com.roshka.sifen.Sifen;
+import com.roshka.sifen.core.beans.response.RespuestaConsultaRUC;
+
+public class ConsultaRUCExample {
+    
+    public void consultarRUC() throws Exception {
+        RespuestaConsultaRUC respuesta = Sifen.consultaRUC("80089752");
+        
+        if (respuesta.getCodigoEstado() == 200) {
+            System.out.println("RUC: " + respuesta.getxContRUC().getdRUC());
+            System.out.println("Razón Social: " + respuesta.getxContRUC().getdNombres());
+        }
+    }
+}
 ```
 
-El parámetro es el RUC del contribuyente a consultar, sin el DV (Dígito Verificador).
+### Ejemplo: Recepción de Evento (Cancelación)
 
-Para ver la estructura de la respuesta a esta consulta, revisar el Manual Técnico de Sifen, cuyo enlace se encuentra al
-principio de esta sección.
+```java
+import com.roshka.sifen.Sifen;
+import com.roshka.sifen.core.beans.EventosDE;
+import com.roshka.sifen.core.beans.response.RespuestaRecepcionEvento;
+import com.roshka.sifen.core.fields.request.event.TrGesEve;
 
-## Nota Técnica Nº 13 (23/04/2023)
+public class CancelacionExample {
+    
+    public void cancelarDocumento(String cdc) throws Exception {
+        EventosDE eventosDE = new EventosDE();
+        eventosDE.setdFecFirma(LocalDateTime.now());
+        
+        TrGesEve evento = new TrGesEve();
+        evento.setrGeVeCan(/* configurar evento de cancelación */);
+        
+        eventosDE.setrGesEveList(Collections.singletonList(evento));
+        
+        // Ahora funciona correctamente sin XML mal formado
+        RespuestaRecepcionEvento respuesta = Sifen.recepcionEvento(eventosDE);
+        
+        if (respuesta.getCodigoEstado() == 200) {
+            System.out.println("Evento procesado exitosamente");
+        }
+    }
+}
+```
 
-La Nota Técnica Nº 13 establece cambios en los campos de IVA de los documentos electrónicos. Las fechas de implementación de estos campos son las siguientes:
+### Ejemplo: Spring Boot Service
 
-* Ambiente de desarrollo: 21/04/2023
-* Ambiente de producción: 21/05/2023
+```java
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import javax.annotation.PostConstruct;
 
-Para esto se agrega una propiedad en el archivo de configuración `sifen.habilitar_nota_tecnica_13`. Esta propiedad es booleana,
-si el valor es verdadero, entonces se agregará el nuevo elemento XML al documento electrónico correspondiente. Lo lógico sería
-que este valor luego de la fecha de puesta en producción, sea *siempre* `true`.
+@Service
+public class SifenService {
+    
+    @Value("${sifen.certificado.path}")
+    private String certificadoPath;
+    
+    @Value("${sifen.certificado.password}")
+    private String certificadoPassword;
+    
+    @Value("${sifen.csc}")
+    private String csc;
+    
+    @Value("${sifen.csc.id}")
+    private String cscId;
+    
+    @PostConstruct
+    public void init() {
+        SifenConfig config = new SifenConfig(
+            SifenConfig.TipoAmbiente.PROD,
+            SifenConfig.TipoCertificadoCliente.PFX,
+            certificadoPath,
+            certificadoPassword
+        );
+        config.setCsc(csc);
+        config.setCscId(cscId);
+        
+        Sifen.setSifenConfig(config);
+    }
+    
+    public RespuestaConsultaRUC consultarRUC(String ruc) throws Exception {
+        return Sifen.consultaRUC(ruc);
+    }
+    
+    public RespuestaRecepcionEvento cancelarDocumento(EventosDE eventosDE) throws Exception {
+        return Sifen.recepcionEvento(eventosDE);
+    }
+}
+```
 
-## Nota Técnica Nº 14 (23/04/2023)
+## 🔧 Servicios Web disponibles
 
-La Nota Técnica Nº 14 aun no está soportada en esta versión.
+- ✅ Consulta de RUC
+- ✅ Recepción de Documento Electrónico (Síncrono)
+- ✅ Consulta de Documentos Electrónicos
+- ✅ Recepción de Lote de Documentos Electrónicos (Asíncrono)
+- ✅ Consulta de Estado de Documentos Electrónicos (Lote)
+- ✅ Recepción de Eventos (Cancelación, Inutilización, etc.)
 
-## Sugerencias
+## 🔄 Migración desde la versión original
 
-Si tenés alguna duda o consulta, o encontraste un comportamiento incorrecto dentro de la librería, no dudes en crear
-un *issue*.
+Si estás usando `com.roshka.sifen:rshk-jsifenlib:0.2.4`:
 
-## Contribución
-
-Cualquier contribución es siempre bienvenida. Por favor, crear primero un *issue* para discutir los cambios a ser
-realizados.
-
-## Licencia
-
-`RSHK jsifenlib` está licenciada bajo el MIT License. Ver el archivo [LICENCIA.md](LICENCIA.md) para más detalles.
-
-## Empresas usuarias de jsifenlib
-
-Algunas empresas que utilizan esta librería en producción para sus implementaciones de SIFEN (*) son:
-
-1. [Taxare S.A.](https://www.taxit.com.py) para su producto TAXit! (2021-05)
-2. [NEXO S.A.E.C.A](http://www.nexo.com.py) (2022-03)
-3. [Roshka S.A.](https://www.roshka.com) (2022-04)
-4. [SIFAMERICA S.A.](https://www.sif.com.py) (2022-11)
-5. [Despachos Aduaneros Cacavelos](http://www.despachoscacavelos.com.py/) (2022-11)
-6. [Biggie S.A.](https://www.biggie.com.py/) (2023-01)
-7. [Banco de la Nación Argentina](https://www.bna.com.py/) (2023-01)
-8. [VIDRIO LUZ SRL](http://www.vidrioluz.com.py/web/) (2023-01)
-9. [UNION SRL](http://www.unionsrl.com.py/) (2023-04)
-
-(*) ¿Querés agregar la tuya? Envianos un [email](mailto:pablo@roshka.com.py) para incluirla. 
-
-## Autores y Responsables
-
-- Pablo Santa Cruz ([github/pablo](https://github.com/pablo))
-- Martin Zarza ([github/martinzarza](https://github.com/martinzarza))
-- David Ayala ([github/david-ayala](https://github.com/david-ayala))
-
-## Diferencias con el proyecto original
-
-- ✅ **Dependencias SOAP incluidas**: `saaj-impl:1.5.3` y `javax.xml.soap-api:1.4.0`
-- ✅ **XML bien formado**: Corrige el problema de XML mal formado en `recepcionEvento()`
-- ✅ **Sincronización regular**: Este fork se mantiene actualizado con el proyecto upstream
-
-## Migración desde la versión original
-
-Si estás usando la versión original y tienes problemas con XML mal formado en eventos de cancelación:
-
+**Antes:**
 ```xml
-<!-- Reemplazar esto -->
 <dependency>
     <groupId>com.roshka.sifen</groupId>
     <artifactId>rshk-jsifenlib</artifactId>
     <version>0.2.4</version>
 </dependency>
+```
 
-<!-- Por esto -->
+**Después:**
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <url>https://maven.pkg.github.com/GabFrank/rshk-jsifenlib</url>
+    </repository>
+</repositories>
+
 <dependency>
     <groupId>io.github.gabfrank</groupId>
     <artifactId>jsifenlib</artifactId>
-    <version>0.2.4-frc.3</version>
+    <version>0.2.4-frc.13</version>
 </dependency>
 ```
 
-No se requieren cambios en el código, solo actualizar la dependencia.
+**No se requieren cambios en el código**, solo actualizar la dependencia y configurar GitHub Packages.
 
-## Sincronización con upstream
+## 🐛 Troubleshooting
 
-Este fork se mantiene sincronizado con el [proyecto original](https://github.com/roshkadev/rshk-jsifenlib). Cuando el proyecto original publique una nueva versión con estos fixes, se evaluará la migración de vuelta al proyecto principal.
+### Error 401 al descargar la dependencia
+
+- Verifica que tu Personal Access Token tenga el scope `read:packages`
+- Verifica que el `<id>` en `settings.xml` coincida con el `<id>` del repositorio en `pom.xml`
+- Verifica que el token no haya expirado
+
+### No encuentra la dependencia
+
+```bash
+# Limpiar cache de Maven
+mvn dependency:purge-local-repository
+
+# O forzar actualización
+mvn clean install -U
+```
+
+### Ver logs detallados
+
+```bash
+mvn clean install -X
+```
+
+## 📝 Notas Técnicas
+
+### Nota Técnica Nº 13 (23/04/2023)
+
+Cambios en los campos de IVA. Para habilitarla:
+
+```properties
+sifen.habilitar_nota_tecnica_13=true
+```
+
+### Nota Técnica Nº 14
+
+Aún no soportada en esta versión.
+
+## 🤝 Contribución
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Crea un issue para discutir los cambios
+2. Fork el proyecto
+3. Crea una rama para tu feature
+4. Envía un pull request
+
+## 📄 Licencia
+
+MIT License - Ver [LICENCIA.md](LICENCIA.md)
+
+## 🔗 Enlaces
+
+- [Proyecto original](https://github.com/roshkadev/rshk-jsifenlib)
+- [Manual Técnico SIFEN](https://www.dnit.gov.py/documents/20123/420592/Manual+T%C3%A9cnico+Versi%C3%B3n+150.pdf)
+- [Releases](https://github.com/GabFrank/rshk-jsifenlib/releases)
+- [Issues](https://github.com/GabFrank/rshk-jsifenlib/issues)
+
+## 👥 Autores
+
+**Proyecto Original:**
+- Pablo Santa Cruz ([github/pablo](https://github.com/pablo))
+- Martin Zarza ([github/martinzarza](https://github.com/martinzarza))
+- David Ayala ([github/david-ayala](https://github.com/david-ayala))
+
+**Fork:**
+- Gabriel Frank ([github/GabFrank](https://github.com/GabFrank))
+
+---
+
+⭐ Si este fork te fue útil, considera darle una estrella al repositorio
