@@ -2,11 +2,10 @@ plugins {
     id "java-library"
     id "maven-publish"
     id "signing"
-    id "com.gradleup.nmcp" version "0.0.8"
 }
 
 group "io.github.gabfrank"
-version "0.2.4-frc.11"
+version "0.2.4-frc.12"
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -82,13 +81,17 @@ publishing {
         }
     }
 
-}
-
-nmcp {
-    publishAllProjectsProbablyBreakingProjectIsolation {
-        username = System.getenv("CENTRAL_USERNAME")
-        password = System.getenv("CENTRAL_PASSWORD")
-        publicationType = "AUTOMATIC"
+    repositories {
+        maven {
+            name = "OSSRH"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = System.getenv("CENTRAL_USERNAME")
+                password = System.getenv("CENTRAL_PASSWORD")
+            }
+        }
     }
 }
 
