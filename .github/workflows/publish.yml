@@ -30,7 +30,7 @@ jobs:
       run: ./gradlew clean build
       
     - name: Publish to Maven Central
-      run: ./gradlew publishAllPublicationsToMavenCentral
+      run: ./gradlew publishAllProjectsProbablyBreakingProjectIsolation
       env:
         CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
         CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
