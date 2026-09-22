@@ -90,7 +90,12 @@ public class TgTotSub extends SifenObjectBase {
                 this.dTotOpe = this.dTotOpe.add(dTotOpeItem);
 
             this.dTotDesc = this.dTotDesc.add(SifenUtil.coalesce(gCamItem.getgValorItem().getgValorRestaItem().getdDescItem().multiply(gCamItem.getdCantProSer()), BigDecimal.ZERO));
-            this.dTotDescGlotem = this.dTotDescGlotem.add(SifenUtil.coalesce(gCamItem.getgValorItem().getgValorRestaItem().getdDescGloItem(), BigDecimal.ZERO));
+            // EA004 (dDescGloItem) es un descuento sobre el PRECIO UNITARIO, igual que EA002
+            // (dDescItem) en la linea de arriba: los dos van multiplicados por la cantidad.
+            // Sin el multiply, F033 queda sin ponderar mientras dTotOpe si lo esta, y la
+            // regla 144 del MT ([EA004 * 100 / E721] contra F010, tolerancia 0.8) no puede
+            // cerrar para ningun item con cantidad != 1. Ver issue upstream #28.
+            this.dTotDescGlotem = this.dTotDescGlotem.add(SifenUtil.coalesce(gCamItem.getgValorItem().getgValorRestaItem().getdDescGloItem().multiply(gCamItem.getdCantProSer()), BigDecimal.ZERO));
             this.dTotAntItem = this.dTotAntItem.add(SifenUtil.coalesce(gCamItem.getgValorItem().getgValorRestaItem().getdAntPreUniIt(), BigDecimal.ZERO));
             this.dTotAnt = this.dTotAnt.add(SifenUtil.coalesce(gCamItem.getgValorItem().getgValorRestaItem().getdAntGloPreUniIt(), BigDecimal.ZERO));
 
