@@ -37,7 +37,7 @@ public class DEMonedaExtranjeraTest extends DETestBase {
         // Grupo C
         TgTimb gTimb = new TgTimb();
         gTimb.setiTiDE(TTiDE.FACTURA_ELECTRONICA);
-        gTimb.setdNumTim(12557605);
+        gTimb.setdNumTim("12557605");
         gTimb.setdEst("001");
         gTimb.setdPunExp("002");
         gTimb.setdNumDoc("0000008");
