@@ -105,7 +105,13 @@ public class TgTotSub extends SifenObjectBase {
         this.dPorcDescTotal = this.dDescTotal.multiply(BigDecimal.valueOf(100)).divide(this.dTotOpe.add(this.dDescTotal), 2, RoundingMode.HALF_UP);
         this.dAnticipo = this.dTotAntItem.add(this.dTotAnt);
 
-        this.dRedon = RedondeoUtil.redondeoOficialSET(cMoneOpe, this.dTotOpe);
+        // El redondeo a 50 Gs aplica solo a guaranies (Res. 347/2014). En otra moneda el MT solo
+        // "acepta" redondeos de hasta 50 centimos y para F013 dice "si no cuenta con redondeo
+        // completar con cero": redondear al multiplo de 0,50 cambiaba el total facturado (1,64 USD
+        // salia como 1,50) y dTotalGs dejaba de coincidir con el documento del emisor.
+        this.dRedon = cMoneOpe == CMondT.PYG
+                ? RedondeoUtil.redondeoOficialSET(cMoneOpe, this.dTotOpe)
+                : BigDecimal.ZERO;
         this.dTotGralOpe = this.dTotOpe.subtract(this.dRedon).add(SifenUtil.coalesce(this.dComi, BigDecimal.ZERO));
         this.dRedon = this.dRedon.abs();
 
