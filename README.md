@@ -62,7 +62,7 @@ Edita o crea `~/.m2/settings.xml`:
     <dependency>
         <groupId>io.github.gabfrank</groupId>
         <artifactId>jsifenlib</artifactId>
-        <version>0.2.4-frc.13</version>
+        <version>0.2.4-frc.15</version>
     </dependency>
 </dependencies>
 ```
@@ -98,7 +98,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.13'
+    implementation 'io.github.gabfrank:jsifenlib:0.2.4-frc.15'
 }
 ```
 
@@ -296,7 +296,7 @@ Si estás usando `com.roshka.sifen:rshk-jsifenlib:0.2.4`:
 <dependency>
     <groupId>io.github.gabfrank</groupId>
     <artifactId>jsifenlib</artifactId>
-    <version>0.2.4-frc.13</version>
+    <version>0.2.4-frc.15</version>
 </dependency>
 ```
 
